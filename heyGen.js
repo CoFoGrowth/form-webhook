@@ -139,16 +139,23 @@ async function waitForVideoCompletion(videoId) {
 async function verifyAndUseAvatarId(avatarId) {
   console.log(`Weryfikuję avatar_id: ${avatarId}`);
   try {
+    if (!avatarId || typeof avatarId !== "string") {
+      throw new Error("Nieprawidłowy format avatar_id");
+    }
+
     const response = await axios.get("https://api.heygen.com/v2/avatars", {
       headers: {
         "X-Api-Key": process.env.HEYGEN_API_KEY,
         Accept: "application/json",
       },
     });
+
     console.log(
       `Otrzymano ${response.data.data.avatars.length} awatarów z API`
     );
     const avatars = response.data.data.avatars;
+
+    // Szukamy awatara po dokładnym dopasowaniu ID
     const avatar = avatars.find((a) => a.avatar_id === avatarId);
 
     if (!avatar) {
@@ -157,7 +164,7 @@ async function verifyAndUseAvatarId(avatarId) {
     }
 
     console.log(
-      `Znaleziono awatar: ${avatar.avatar_name}, ID: ${avatar.avatar_id}`
+      `Znaleziono awatar: ${avatar.avatar_name} (${avatar.gender}), ID: ${avatar.avatar_id}`
     );
     return avatar.avatar_id;
   } catch (error) {
