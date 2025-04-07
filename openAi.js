@@ -7,6 +7,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 async function callAssistant(prompt) {
   console.log("Rozpoczynam wywołanie asystenta OpenAI");
   const assistantId = "asst_DE9kt4lKO0KLTPAlgudaXlpR";
+  const timeout = 60000; // Timeout 60 sekund
 
   const headers = {
     Authorization: `Bearer ${OPENAI_API_KEY}`,
@@ -68,11 +69,20 @@ async function callAssistant(prompt) {
     let attempts = 0;
     const maxAttempts = 30;
 
+    // Ustawienie globalnego timera dla całej operacji
+    const startTime = Date.now();
+
     do {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       console.log(
         `Sprawdzam status zadania (próba ${attempts + 1}/${maxAttempts})...`
       );
+
+      // Sprawdź, czy nie upłynął globalny timeout
+      if (Date.now() - startTime > timeout) {
+        console.error(`Przekroczono globalny timeout ${timeout}ms`);
+        throw new Error("Timeout podczas wywołania asystenta OpenAI");
+      }
 
       const statusResponse = await axios.get(
         `https://api.openai.com/v1/threads/${threadId}/runs/${runId}`,

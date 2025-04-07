@@ -181,36 +181,23 @@ app.post("/form-webhook", async (req, res) => {
 
       console.log("Wiadomość dla GPT:", gptMessage);
 
-      // Dodajemy timeout dla wywołania asystenta
+      // Przygotowanie fallbackowego promptu
       let generatedPrompt;
       const fallbackPrompt =
         "Rozwiązania AI to przyszłość, która dzieje się na naszych oczach. Automatyzacja procesów, zwiększona efektywność i nowe horyzonty biznesowe – sztuczna inteligencja zmienia zasady gry w każdej branży. W świecie, gdzie każda sekunda ma znaczenie, AI daje Ci przewagę nad całym rynkiem. W CoFo dostarczamy rozwiązania skrojone na miarę Twoich potrzeb. Inwestycja w AI niedługo i tak będzie częścią Twojego biznesu. Zrób to teraz, zrób to lepiej.";
 
       try {
-        console.log("Próba wywołania asystenta OpenAI z timeoutem 60 sekund");
+        console.log("Wywołuję asystenta OpenAI");
 
-        // Ustawiamy timeout na 60 sekund
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => {
-            reject(new Error("Timeout podczas wywołania asystenta OpenAI"));
-          }, 60000);
-        });
-
-        // Wywołujemy asystenta z timeoutem
-        generatedPrompt = await Promise.race([
-          callAssistant(gptMessage),
-          timeoutPromise,
-        ]);
+        // Wywołujemy asystenta z wbudowanym timeoutem w funkcji callAssistant
+        generatedPrompt = await callAssistant(gptMessage);
 
         console.log(
           "Otrzymano odpowiedź od asystenta OpenAI:",
           generatedPrompt
         );
       } catch (error) {
-        console.error(
-          "Błąd lub timeout podczas wywoływania asystenta:",
-          error.message
-        );
+        console.error("Błąd podczas wywoływania asystenta:", error.message);
         console.log("Używam domyślnego promptu");
         generatedPrompt = fallbackPrompt;
       }
