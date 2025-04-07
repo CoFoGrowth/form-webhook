@@ -172,7 +172,21 @@ app.post("/form-webhook", async (req, res) => {
   (async () => {
     try {
       // Tworzymy wiadomość dla GPT na podstawie danych formularza
-      const gptMessage = `Stwórz prompt wideo na podstawie następujących szczegółów:
+      const gptMessage = `Stwórz szczegółowy prompt do wygenerowania wideo z awatarem, oparty na poniższych informacjach. Pamiętaj, że celem jest promocja marki osobistej osoby, która generuje to wideo. W związku z tym:
+          Zaproponuj pełny tekst, który awatar ma wypowiedzieć – wypowiedź powinna być spójna, naturalna i dostosowana do stylu osoby budującej swoją markę.
+          Tekst powinien podkreślać kompetencje, wartości i misję autora wideo – skup się na tym, co wyróżnia go na tle innych.
+          Zadbaj, by wypowiedź była angażująca i skierowana do konkretnej grupy odbiorców, np. klientów, współpracowników, obserwatorów w social media.
+          Styl wypowiedzi powinien być autentyczny i zgodny z charakterem marki osobistej – może być profesjonalny, inspirujący, luźny lub ekspercki – w zależności od celu.
+          Na końcu wypowiedzi warto dodać wezwanie do działania (call to action), np. „obserwuj mnie, by poznać więcej”, „odezwij się, jeśli chcesz współpracować” itp.
+          Przykładowy cel promptu:
+          „Chcę stworzyć krótkie, 30-sekundowe wideo, w którym mój awatar opowiada, czym się zajmuję, jakie mam podejście do pracy i zaprasza do kontaktu.”
+          Podaj poniżej szczegóły do stworzenia promptu, takie jak:
+          Branża/zawód
+          Główne usługi lub produkty
+          Wyróżnik (co ją/go odróżnia od innych)
+          Ton wypowiedzi (np. motywujący, profesjonalny, przyjazny)
+          Grupa docelowa (np. startupy, klienci indywidualni, HR)
+          Długość wypowiedzi (np. 30 sekund). Wywnioskuj to na podstawie tych danych:
       - Cel: ${formattedData.cel_video || "brak"}
       - Koncepcja: ${formattedData.koncepcja || "brak"}
       - Opis: ${formattedData.opis || "brak"}
