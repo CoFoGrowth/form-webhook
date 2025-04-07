@@ -15,6 +15,18 @@ async function callAssistant(prompt) {
     "OpenAI-Beta": "assistants=v2",
   };
 
+  // Dodajemy dodatkowe instrukcje do promptu
+  const enhancedPrompt = `${prompt}
+
+WAŻNE INSTRUKCJE:
+1. Wygeneruj TYLKO tekst wypowiedzi awatara, bez żadnych dodatkowych komentarzy czy wyjaśnień
+2. Tekst powinien być w pierwszej osobie (np. "Jestem ekspertem w...")
+3. Unikaj fraz typu "Przepraszam", "Nie udało mi się", "Czy mogę pomóc"
+4. Tekst powinien być konkretny i związany z podanymi informacjami
+5. Zakończ tekst wezwaniem do działania
+6. Nie przekraczaj 300 słów
+7. Nie używaj znaków nowej linii w tekście`;
+
   try {
     // Krok 1: Utwórz nowy wątek
     console.log("Wysyłam żądanie utworzenia wątku...");
@@ -34,7 +46,7 @@ async function callAssistant(prompt) {
     console.log("Wysyłam żądanie dodania wiadomości...");
     const messageData = {
       role: "user",
-      content: prompt,
+      content: enhancedPrompt,
     };
 
     const messageResponse = await axios.post(

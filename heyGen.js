@@ -135,9 +135,44 @@ async function waitForVideoCompletion(videoId) {
   throw new Error("Przekroczono limit czasu generowania wideo");
 }
 
+// Funkcja do weryfikacji i używania avatar_id
+async function verifyAndUseAvatarId(avatarId) {
+  console.log(`Weryfikuję avatar_id: ${avatarId}`);
+  try {
+    const response = await axios.get("https://api.heygen.com/v2/avatars", {
+      headers: {
+        "X-Api-Key": process.env.HEYGEN_API_KEY,
+        Accept: "application/json",
+      },
+    });
+    console.log(
+      `Otrzymano ${response.data.data.avatars.length} awatarów z API`
+    );
+    const avatars = response.data.data.avatars;
+    const avatar = avatars.find((a) => a.avatar_id === avatarId);
+
+    if (!avatar) {
+      console.error(`Awatar z ID ${avatarId} nie został znaleziony`);
+      throw new Error(`Awatar z ID ${avatarId} nie został znaleziony`);
+    }
+
+    console.log(
+      `Znaleziono awatar: ${avatar.avatar_name}, ID: ${avatar.avatar_id}`
+    );
+    return avatar.avatar_id;
+  } catch (error) {
+    console.error(
+      `Błąd podczas weryfikacji avatar_id ${avatarId}:`,
+      error.message
+    );
+    throw error;
+  }
+}
+
 module.exports = {
   getAvatarIdByName,
   getPolishVoiceId,
   generateHeyGenVideo,
   waitForVideoCompletion,
+  verifyAndUseAvatarId,
 };

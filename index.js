@@ -39,6 +39,7 @@ const {
   getPolishVoiceId,
   generateHeyGenVideo,
   waitForVideoCompletion,
+  verifyAndUseAvatarId,
 } = require("./heyGen");
 const {
   uploadVideoToZapCapFromUrl,
@@ -54,10 +55,21 @@ async function processForm(formData) {
     console.log("Rozpoczynam przetwarzanie formularza...");
     const { avatar, text, fileId } = formData;
 
-    // Pobierz ID avatara i głosu
-    console.log("Pobieram ID awatara...");
-    const avatarId = await getAvatarIdByName(avatar);
-    console.log("ID awatara:", avatarId);
+    // Weryfikacja i użycie avatar_id
+    console.log("Weryfikuję avatar_id...");
+    let avatarId;
+    try {
+      avatarId = await verifyAndUseAvatarId(fileId);
+      console.log("ID awatara:", avatarId);
+    } catch (error) {
+      console.error(
+        `Błąd podczas weryfikacji avatar_id ${fileId}:`,
+        error.message
+      );
+      // Próbujemy użyć domyślnego awatara
+      avatarId = await getAvatarIdByName("Anna");
+      console.log("Używam domyślnego awatara Anna, ID:", avatarId);
+    }
 
     console.log("Pobieram ID głosu...");
     const voiceId = await getPolishVoiceId();
@@ -179,7 +191,7 @@ app.post("/form-webhook", async (req, res) => {
         Wyróżniać mnie na tle innych w mojej branży.
         Być angażująca i skierowana do konkretnej grupy odbiorców (np. klienci, współpracownicy, obserwatorzy).
         Mieć styl dopasowany do mojej marki osobistej (np. profesjonalny, motywujący, luźny).
-        Zawierać wezwanie do działania na końcu (np. „Obserwuj mnie, by poznać więcej”, „Napisz, jeśli chcesz współpracować”).
+        Zawierać wezwanie do działania na końcu (np. "Obserwuj mnie, by poznać więcej", "Napisz, jeśli chcesz współpracować").
         Długość wypowiedzi: ok. 30 sekund (maks. 300 słów).
         Nie przekraczaj tej długości.
         Na podstawie poniższych informacji stwórz samą wypowiedź awatara:
