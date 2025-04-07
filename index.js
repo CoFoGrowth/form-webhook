@@ -172,21 +172,17 @@ app.post("/form-webhook", async (req, res) => {
   (async () => {
     try {
       // Tworzymy wiadomość dla GPT na podstawie danych formularza
-      const gptMessage = `Stwórz szczegółowy prompt do wygenerowania wideo z awatarem, oparty na poniższych informacjach. Pamiętaj, że celem jest promocja marki osobistej osoby, która generuje to wideo. W związku z tym:
-          Zaproponuj pełny tekst, który awatar ma wypowiedzieć – wypowiedź powinna być spójna, naturalna i dostosowana do stylu osoby budującej swoją markę.
-          Tekst powinien podkreślać kompetencje, wartości i misję autora wideo – skup się na tym, co wyróżnia go na tle innych.
-          Zadbaj, by wypowiedź była angażująca i skierowana do konkretnej grupy odbiorców, np. klientów, współpracowników, obserwatorów w social media.
-          Styl wypowiedzi powinien być autentyczny i zgodny z charakterem marki osobistej – może być profesjonalny, inspirujący, luźny lub ekspercki – w zależności od celu.
-          Na końcu wypowiedzi warto dodać wezwanie do działania (call to action), np. „obserwuj mnie, by poznać więcej”, „odezwij się, jeśli chcesz współpracować” itp.
-          Przykładowy cel promptu:
-          „Chcę stworzyć krótkie, 30-sekundowe wideo, w którym mój awatar opowiada, czym się zajmuję, jakie mam podejście do pracy i zaprasza do kontaktu.”
-          Podaj poniżej szczegóły do stworzenia promptu, takie jak:
-          Branża/zawód
-          Główne usługi lub produkty
-          Wyróżnik (co ją/go odróżnia od innych)
-          Ton wypowiedzi (np. motywujący, profesjonalny, przyjazny)
-          Grupa docelowa (np. startupy, klienci indywidualni, HR)
-          Długość wypowiedzi (np. 30 sekund). Wywnioskuj to na podstawie tych danych:
+      const gptMessage = `Stwórz wyłącznie tekst, który mój awatar ma wypowiedzieć w krótkim wideo promującym moją markę osobistą. Nie opisuj koncepcji, nie dodawaj wprowadzeń ani podsumowań — oczekuję tylko gotowej wypowiedzi awatara, maksymalnie 300 słów.
+        Wypowiedź powinna:
+        Brzmieć naturalnie i spójnie – jakby mówiła ją osoba promująca swoją markę.
+        Podkreślać moje kompetencje, wartości i misję.
+        Wyróżniać mnie na tle innych w mojej branży.
+        Być angażująca i skierowana do konkretnej grupy odbiorców (np. klienci, współpracownicy, obserwatorzy).
+        Mieć styl dopasowany do mojej marki osobistej (np. profesjonalny, motywujący, luźny).
+        Zawierać wezwanie do działania na końcu (np. „Obserwuj mnie, by poznać więcej”, „Napisz, jeśli chcesz współpracować”).
+        Długość wypowiedzi: ok. 30 sekund (maks. 300 słów).
+        Nie przekraczaj tej długości.
+        Na podstawie poniższych informacji stwórz samą wypowiedź awatara:
       - Cel: ${formattedData.cel_video || "brak"}
       - Koncepcja: ${formattedData.koncepcja || "brak"}
       - Opis: ${formattedData.opis || "brak"}
