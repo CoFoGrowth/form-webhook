@@ -5,7 +5,7 @@ const axios = require("axios");
 
 // Inicjalizacja autoryzacji dla konta usługi
 const serviceAccountAuth = new google.auth.GoogleAuth({
-  keyFile: "./service-account-key.json",
+  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
   scopes: ["https://www.googleapis.com/auth/drive"],
 });
 
