@@ -42,35 +42,32 @@ async function getPolishVoiceId(gender) {
     console.log(`Otrzymano ${response.data.data.voices.length} głosów z API`);
     const voices = response.data.data.voices;
 
-    // Filtrowanie głosów polskich i zgodnych z płcią
+    // Filtrowanie głosów polskich
     const polishVoices = voices.filter((v) => v.language === "Polish");
     if (!polishVoices.length) {
       console.error("Brak dostępnych głosów dla języka polskiego");
       throw new Error("Brak dostępnych głosów dla języka polskiego");
     }
 
-    let voice;
-    if (gender.toLowerCase() === "male") {
-      voice =
-        polishVoices.find((v) => v.gender.toLowerCase() === "male") ||
-        polishVoices[0];
-    } else if (gender.toLowerCase() === "female") {
-      voice =
-        polishVoices.find((v) => v.gender.toLowerCase() === "female") ||
-        polishVoices[0];
-    } else {
-      voice = polishVoices[0]; // Domyślny głos, jeśli płeć nie jest określona
+    // Domyślne ID głosów
+    const femaleVoiceId = "26b2064088674c80b1e5fc5ab1a068eb"; // Głos kobiecy
+    const maleVoiceId = "c126eda711af4a2086c4cfb60ae93304"; // Głos męski
+
+    // Sprawdzanie płci i wybór odpowiedniego głosu
+    if (gender && typeof gender === "string") {
+      const lowerGender = gender.toLowerCase();
+      if (lowerGender === "female") {
+        console.log(`Wybrano głos kobiecy: ${femaleVoiceId}`);
+        return femaleVoiceId;
+      } else if (lowerGender === "male") {
+        console.log(`Wybrano głos męski: ${maleVoiceId}`);
+        return maleVoiceId;
+      }
     }
 
-    if (!voice) {
-      console.error(`Brak głosu dla płci ${gender} w języku polskim`);
-      throw new Error(`Brak głosu dla płci ${gender} w języku polskim`);
-    }
-
-    console.log(
-      `Znaleziono głos polski, ID: ${voice.voice_id}, Płeć: ${voice.gender}`
-    );
-    return voice.voice_id;
+    // Domyślnie używamy głosu kobiecego, jeśli płeć nie jest zdefiniowana
+    console.log(`Używam domyślnego głosu kobiecego: ${femaleVoiceId}`);
+    return femaleVoiceId;
   } catch (error) {
     console.error("Błąd podczas pobierania ID głosu:", error.message);
     throw error;
