@@ -266,11 +266,21 @@ app.post("/custom-script-for-heygen", async (req, res) => {
 
   const data = req.body;
   const formattedData = {
-    custom_script: data["Wklej swój skrypt"],
+    custom_script: data["Wklej swój skrypt:"] || data["Wklej swój skrypt"],
     form_id: data.form_id,
     form_name: data.form_name,
   };
   console.log("Dane z formularza:", formattedData);
+
+  // Walidacja danych
+  if (!formattedData.custom_script) {
+    console.error("Brak tekstu skryptu w danych formularza");
+    return res.status(400).json({
+      success: false,
+      message: "Brak tekstu skryptu w danych formularza",
+      form_id: formattedData.form_id || "custom-script-form",
+    });
+  }
 
   // Przygotowanie odpowiedzi w formacie zgodnym z Elementorem
   const responseData = {
@@ -278,7 +288,7 @@ app.post("/custom-script-for-heygen", async (req, res) => {
     message: "Custom script form submitted successfully",
     form_id: formattedData.form_id || "custom-script-form",
     data: {
-      custom_script: formattedData.custom_script || "",
+      custom_script: formattedData.custom_script,
     },
   };
 
