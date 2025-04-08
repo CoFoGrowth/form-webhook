@@ -50,10 +50,9 @@ async function getPolishVoiceId(gender) {
     }
 
     // Domyślne ID głosów
-    const femaleVoiceId = "26b2064088674c80b1e5fc5ab1a068eb"; // Głos kobiecy
-    const maleVoiceId = "c126eda711af4a2086c4cfb60ae93304"; // Głos męski
+    const femaleVoiceId = "ba3b2274201d4f18b8b6888ad991bffe";
+    const maleVoiceId = "c126eda711af4a2086c4cfb60ae93304";
 
-    // Sprawdzanie płci i wybór odpowiedniego głosu
     if (gender && typeof gender === "string") {
       const lowerGender = gender.toLowerCase();
       if (lowerGender === "female") {
@@ -65,7 +64,6 @@ async function getPolishVoiceId(gender) {
       }
     }
 
-    // Domyślnie używamy głosu kobiecego, jeśli płeć nie jest zdefiniowana
     console.log(`Używam domyślnego głosu kobiecego: ${femaleVoiceId}`);
     return femaleVoiceId;
   } catch (error) {
@@ -74,11 +72,9 @@ async function getPolishVoiceId(gender) {
   }
 }
 
-// Funkcja do generowania wideo w HeyGen
 async function generateHeyGenVideo(avatarId, text) {
   console.log("Generuję wideo w HeyGen...");
   try {
-    // Pobierz dane awatara, aby określić płeć
     const avatarResponse = await axios.get(
       "https://api.heygen.com/v2/avatars",
       {
@@ -95,7 +91,6 @@ async function generateHeyGenVideo(avatarId, text) {
       throw new Error(`Awatar o ID ${avatarId} nie istnieje`);
     }
 
-    // Pobierz odpowiedni głos na podstawie płci awatara
     const voiceId = await getPolishVoiceId(avatar.gender);
 
     const response = await axios.post(
