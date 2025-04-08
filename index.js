@@ -258,6 +258,117 @@ app.post("/form-webhook", async (req, res) => {
   })();
 });
 
+// Custom script webhook handler
+app.post("/custom-script-for-heygen", async (req, res) => {
+  console.log("Otrzymano żądanie custom-script webhooka");
+  console.log("Otrzymane dane:", req.body);
+  console.log("Nagłówki żądania:", req.headers);
+
+  const data = req.body;
+  const formattedData = {
+    custom_script: data["Wklej swój skrypt"],
+    form_id: data.form_id,
+    form_name: data.form_name,
+  };
+  console.log("Dane z formularza:", formattedData);
+
+  // Przygotowanie odpowiedzi w formacie zgodnym z Elementorem
+  const responseData = {
+    success: true,
+    message: "Custom script form submitted successfully",
+    form_id: formattedData.form_id || "custom-script-form",
+    data: {
+      custom_script: formattedData.custom_script || "",
+    },
+  };
+
+  // Ustawienie nagłówków i natychmiastowe zwrócenie odpowiedzi
+  res.setHeader("Content-Type", "application/json");
+  res.status(200).json(responseData);
+  console.log("Webhook zakończony sukcesem - odpowiedź wysłana");
+
+  // Asynchroniczne przetwarzanie danych w tle
+  (async () => {
+    try {
+      // Używamy stałego ID awatara Amelia
+      const avatarId = "Amelia_sitting_business_training_side";
+      console.log("Używam awatara Amelia, ID:", avatarId);
+
+      // Pobieramy ID głosu dla języka polskiego
+      console.log("Pobieram ID głosu...");
+      const voiceId = await getPolishVoiceId();
+      console.log("ID głosu:", voiceId);
+
+      // Generuj wideo w HeyGen
+      console.log("Generuję wideo w HeyGen...");
+      const heygenVideoId = await generateHeyGenVideo(
+        avatarId,
+        voiceId,
+        formattedData.custom_script
+      );
+      console.log("ID wideo:", heygenVideoId);
+
+      console.log("Czekam na zakończenie generowania wideo...");
+      const videoUrl = await waitForVideoCompletion(heygenVideoId);
+      console.log("URL wideo:", videoUrl);
+
+      const timestamp = Date.now();
+      const folderId =
+        process.env.GOOGLE_DRIVE_FOLDER_ID ||
+        "1aAvDyvyMruVLhNYMM4CCaed4-_lfuZGb";
+
+      // Przesyłanie oryginalnego wideo jako strumień
+      console.log("Przesyłam oryginalne wideo na Google Drive...");
+      const videoResponse = await axios.get(videoUrl, {
+        responseType: "stream",
+      });
+      const originalStream = new PassThrough();
+      videoResponse.data.pipe(originalStream);
+      const originalFileId = await uploadStreamToDrive(
+        originalStream,
+        `custom_script_original_${timestamp}.mp4`,
+        folderId
+      );
+      console.log(`Oryginalne wideo na Google Drive: ${originalFileId}`);
+
+      // Przetwarzanie w ZapCap
+      console.log("Przesyłam wideo do ZapCap...");
+      const zapcapVideoId = await uploadVideoToZapCapFromUrl(videoUrl);
+      console.log("ID wideo w ZapCap:", zapcapVideoId);
+
+      console.log("Tworzę zadanie w ZapCap...");
+      const taskId = await createZapCapTask(zapcapVideoId);
+      console.log("ID zadania:", taskId);
+
+      console.log("Czekam na zakończenie zadania w ZapCap...");
+      const downloadUrl = await waitForZapCapTask(zapcapVideoId, taskId);
+      console.log("URL do pobrania przetworzonego wideo:", downloadUrl);
+
+      // Przesyłanie przetworzonego wideo jako strumień
+      console.log("Przesyłam przetworzone wideo na Google Drive...");
+      const processedResponse = await axios.get(downloadUrl, {
+        responseType: "stream",
+      });
+      const processedStream = new PassThrough();
+      processedResponse.data.pipe(processedStream);
+      const processedFileId = await uploadStreamToDrive(
+        processedStream,
+        `custom_script_processed_${timestamp}.mp4`,
+        folderId
+      );
+      console.log(`Przetworzone wideo na Google Drive: ${processedFileId}`);
+
+      console.log("Przetwarzanie custom script zakończone pomyślnie");
+    } catch (error) {
+      console.error(
+        "Błąd podczas asynchronicznego przetwarzania:",
+        error.message
+      );
+      console.error("Szczegóły błędu:", error.response?.data || error);
+    }
+  })();
+});
+
 // Rate limiter for /webhook endpoint (max. 3 requests per minute)
 const limiter = rateLimit({
   windowMs: 60 * 1000,
