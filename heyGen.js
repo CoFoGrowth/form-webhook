@@ -29,9 +29,9 @@ async function getAvatarIdByName(name) {
   }
 }
 
-// Funkcja do pobierania ID głosu dla języka polskiego
-async function getPolishVoiceId() {
-  console.log("Próba pobrania ID głosu dla języka polskiego");
+// Funkcja do pobierania ID głosu dla języka polskiego na podstawie płci awatara
+async function getPolishVoiceId(gender) {
+  console.log(`Próba pobrania ID głosu dla języka polskiego i płci: ${gender}`);
   try {
     const response = await axios.get("https://api.heygen.com/v2/voices", {
       headers: {
@@ -41,13 +41,36 @@ async function getPolishVoiceId() {
     });
     console.log(`Otrzymano ${response.data.data.voices.length} głosów z API`);
     const voices = response.data.data.voices;
-    const polishVoice = voices.find((v) => v.language === "Polish");
-    if (!polishVoice) {
-      console.error("Brak dostępnego głosu dla języka polskiego");
-      throw new Error("Brak dostępnego głosu dla języka polskiego");
+
+    // Filtrowanie głosów polskich i zgodnych z płcią
+    const polishVoices = voices.filter((v) => v.language === "Polish");
+    if (!polishVoices.length) {
+      console.error("Brak dostępnych głosów dla języka polskiego");
+      throw new Error("Brak dostępnych głosów dla języka polskiego");
     }
-    console.log(`Znaleziono głos polski, ID: ${polishVoice.voice_id}`);
-    return polishVoice.voice_id;
+
+    let voice;
+    if (gender.toLowerCase() === "male") {
+      voice =
+        polishVoices.find((v) => v.gender.toLowerCase() === "male") ||
+        polishVoices[0];
+    } else if (gender.toLowerCase() === "female") {
+      voice =
+        polishVoices.find((v) => v.gender.toLowerCase() === "female") ||
+        polishVoices[0];
+    } else {
+      voice = polishVoices[0]; // Domyślny głos, jeśli płeć nie jest określona
+    }
+
+    if (!voice) {
+      console.error(`Brak głosu dla płci ${gender} w języku polskim`);
+      throw new Error(`Brak głosu dla płci ${gender} w języku polskim`);
+    }
+
+    console.log(
+      `Znaleziono głos polski, ID: ${voice.voice_id}, Płeć: ${voice.gender}`
+    );
+    return voice.voice_id;
   } catch (error) {
     console.error("Błąd podczas pobierania ID głosu:", error.message);
     throw error;
@@ -55,9 +78,29 @@ async function getPolishVoiceId() {
 }
 
 // Funkcja do generowania wideo w HeyGen
-async function generateHeyGenVideo(avatarId, voiceId, text) {
+async function generateHeyGenVideo(avatarId, text) {
   console.log("Generuję wideo w HeyGen...");
   try {
+    // Pobierz dane awatara, aby określić płeć
+    const avatarResponse = await axios.get(
+      "https://api.heygen.com/v2/avatars",
+      {
+        headers: {
+          "X-Api-Key": process.env.HEYGEN_API_KEY,
+          Accept: "application/json",
+        },
+      }
+    );
+    const avatar = avatarResponse.data.data.avatars.find(
+      (a) => a.avatar_id === avatarId
+    );
+    if (!avatar) {
+      throw new Error(`Awatar o ID ${avatarId} nie istnieje`);
+    }
+
+    // Pobierz odpowiedni głos na podstawie płci awatara
+    const voiceId = await getPolishVoiceId(avatar.gender);
+
     const response = await axios.post(
       "https://api.heygen.com/v2/video/generate",
       {
@@ -155,9 +198,7 @@ async function verifyAndUseAvatarId(avatarId) {
     );
     const avatars = response.data.data.avatars;
 
-    // Szukamy awatara po dokładnym dopasowaniu ID
     const avatar = avatars.find((a) => a.avatar_id === avatarId);
-
     if (!avatar) {
       console.error(`Awatar z ID ${avatarId} nie został znaleziony`);
       throw new Error(`Awatar z ID ${avatarId} nie został znaleziony`);
