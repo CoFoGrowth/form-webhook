@@ -266,7 +266,7 @@ app.post("/custom-script-for-heygen", async (req, res) => {
 
   const data = req.body;
   const formattedData = {
-    custom_script: data["Wklej swój skrypt:"] || data["Wklej swój skrypt"],
+    custom_script: data["Wklej swój skrypt:"] || data["Viral"],
     form_id: data.form_id,
     form_name: data.form_name,
   };
