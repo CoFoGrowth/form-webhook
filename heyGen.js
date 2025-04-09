@@ -72,7 +72,8 @@ async function getPolishVoiceId(gender) {
   }
 }
 
-async function generateHeyGenVideo(avatarId, text) {
+// Funkcja do generowania wideo w HeyGen
+async function generateHeyGenVideo(avatarId, voiceId, text) {
   console.log("Generuję wideo w HeyGen...");
   try {
     const avatarResponse = await axios.get(
@@ -90,8 +91,6 @@ async function generateHeyGenVideo(avatarId, text) {
     if (!avatar) {
       throw new Error(`Awatar o ID ${avatarId} nie istnieje`);
     }
-
-    const voiceId = await getPolishVoiceId(avatar.gender);
 
     const response = await axios.post(
       "https://api.heygen.com/v2/video/generate",

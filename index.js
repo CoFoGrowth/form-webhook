@@ -297,19 +297,15 @@ app.post("/custom-script-for-heygen", async (req, res) => {
   res.status(200).json(responseData);
   console.log("Webhook zakończony sukcesem - odpowiedź wysłana");
 
-  // Asynchroniczne przetwarzanie danych w tle
   (async () => {
     try {
-      // Używamy stałego ID awatara Amelia
       const avatarId = "Amelia_sitting_business_training_side";
       console.log("Używam awatara Amelia, ID:", avatarId);
 
-      // Pobieramy ID głosu dla języka polskiego
       console.log("Pobieram ID głosu...");
       const voiceId = await getPolishVoiceId();
       console.log("ID głosu:", voiceId);
 
-      // Generuj wideo w HeyGen
       console.log("Generuję wideo w HeyGen...");
       const heygenVideoId = await generateHeyGenVideo(
         avatarId,
@@ -321,7 +317,6 @@ app.post("/custom-script-for-heygen", async (req, res) => {
       console.log("Czekam na zakończenie generowania wideo...");
       const videoUrl = await waitForVideoCompletion(heygenVideoId);
       console.log("URL wideo:", videoUrl);
-
       const timestamp = Date.now();
       const folderId =
         process.env.GOOGLE_DRIVE_FOLDER_ID ||
