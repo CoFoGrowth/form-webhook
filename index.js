@@ -49,11 +49,36 @@ const {
 const { callAssistant } = require("./openAi");
 const { uploadStreamToDrive } = require("./googleDrive");
 
+// Funkcja pomocnicza do mapowania client_id na folder ID
+function getFolderIdByClientId(clientId) {
+  const folderMapping = {
+    "0001": "1CR027qsHiGXjAwDQ63y4E-Au0TbaioRO",
+    "0002": "1I2tW5r0EclsFhJa9_U4Dg19VXS2FMNZN",
+    "0003": "1nGd_0OlwKv62lRD8tMm5gXqarRqcKKGO",
+    "0004": "13ICKHPlMDifm0esu9St9h-1BYxdUROg9",
+    "0005": "1paE1cfsEMJSE8AN_T5gTjnaMK5xBi8Ze",
+  };
+
+  // Jeśli client_id jest w mapowaniu, zwróć odpowiedni folder ID
+  if (clientId && folderMapping[clientId]) {
+    console.log(
+      `Znaleziono folder dla client_id ${clientId}: ${folderMapping[clientId]}`
+    );
+    return folderMapping[clientId];
+  }
+
+  // W przeciwnym razie użyj domyślnego folderu
+  const defaultFolderId =
+    process.env.GOOGLE_DRIVE_FOLDER_ID || "1aAvDyvyMruVLhNYMM4CCaed4-_lfuZGb";
+  console.log(`Używam domyślnego folderu: ${defaultFolderId}`);
+  return defaultFolderId;
+}
+
 // Funkcja do przetwarzania formularza
 async function processForm(formData) {
   try {
     console.log("Rozpoczynam przetwarzanie formularza...");
-    const { avatar, text, fileId } = formData;
+    const { avatar, text, fileId, client_id } = formData;
 
     // Weryfikacja i użycie avatar_id
     console.log("Weryfikuję avatar_id...");
@@ -85,8 +110,8 @@ async function processForm(formData) {
     console.log("URL wideo:", videoUrl);
 
     const timestamp = Date.now();
-    const folderId =
-      process.env.GOOGLE_DRIVE_FOLDER_ID || "1aAvDyvyMruVLhNYMM4CCaed4-_lfuZGb";
+    // Używamy funkcji pomocniczej do określenia folderu na podstawie client_id
+    const folderId = getFolderIdByClientId(client_id);
 
     // Przesyłanie oryginalnego wideo jako strumień
     console.log("Przesyłam oryginalne wideo na Google Drive...");
@@ -160,6 +185,7 @@ app.post("/form-webhook", async (req, res) => {
     prompt: data["Twój prompt"],
     awatar: data["Wybierz awatara"],
     zgoda: data["Zaakceptuj regulamin przetwarzania danych:"],
+    client_id: data["client_id"],
   };
   console.log("Dane z formularza:", formattedData);
 
@@ -239,6 +265,7 @@ app.post("/form-webhook", async (req, res) => {
         avatar: formattedData.awatar,
         text: generatedPrompt,
         fileId: formattedData.avatar_id,
+        client_id: formattedData.client_id,
       });
 
       console.log(
@@ -269,6 +296,7 @@ app.post("/custom-script-for-heygen", async (req, res) => {
     custom_script: data["Wklej swój skrypt:"] || data["Viral"],
     form_id: data.form_id,
     form_name: data.form_name,
+    client_id: data["client_id"],
   };
   console.log("Dane z formularza:", formattedData);
 
@@ -318,9 +346,7 @@ app.post("/custom-script-for-heygen", async (req, res) => {
       const videoUrl = await waitForVideoCompletion(heygenVideoId);
       console.log("URL wideo:", videoUrl);
       const timestamp = Date.now();
-      const folderId =
-        process.env.GOOGLE_DRIVE_FOLDER_ID ||
-        "1aAvDyvyMruVLhNYMM4CCaed4-_lfuZGb";
+      const folderId = getFolderIdByClientId(formattedData.client_id);
 
       // Przesyłanie oryginalnego wideo jako strumień
       console.log("Przesyłam oryginalne wideo na Google Drive...");
