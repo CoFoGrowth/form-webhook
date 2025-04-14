@@ -78,7 +78,7 @@ function getFolderIdByClientId(clientId) {
 async function processForm(formData) {
   try {
     console.log("Rozpoczynam przetwarzanie formularza...");
-    const { avatar, text, fileId, client_id } = formData;
+    const { avatar, text, fileId, client_id, brollPercent } = formData;
 
     // Weryfikacja i użycie avatar_id
     console.log("Weryfikuję avatar_id...");
@@ -133,7 +133,7 @@ async function processForm(formData) {
     console.log("ID wideo w ZapCap:", zapcapVideoId);
 
     console.log("Tworzę zadanie w ZapCap...");
-    const taskId = await createZapCapTask(zapcapVideoId);
+    const taskId = await createZapCapTask(zapcapVideoId, brollPercent);
     console.log("ID zadania:", taskId);
 
     console.log("Czekam na zakończenie zadania w ZapCap...");
@@ -186,6 +186,7 @@ app.post("/form-webhook", async (req, res) => {
     awatar: data["Wybierz awatara"],
     zgoda: data["Zaakceptuj regulamin przetwarzania danych:"],
     client_id: data["client_id"],
+    brollPercent: parseInt(data["slider"] || "50", 10),
   };
   console.log("Dane z formularza:", formattedData);
 
@@ -266,6 +267,7 @@ app.post("/form-webhook", async (req, res) => {
         text: generatedPrompt,
         fileId: formattedData.avatar_id,
         client_id: formattedData.client_id,
+        brollPercent: formattedData.brollPercent,
       });
 
       console.log(
@@ -297,6 +299,8 @@ app.post("/custom-script-for-heygen", async (req, res) => {
     form_id: data.form_id,
     form_name: data.form_name,
     client_id: data["client_id"],
+    avatar_id: data["avatar_id"],
+    brollPercent: parseInt(data["slider"] || "50", 10),
   };
   console.log("Dane z formularza:", formattedData);
 
@@ -327,8 +331,21 @@ app.post("/custom-script-for-heygen", async (req, res) => {
 
   (async () => {
     try {
-      const avatarId = "Amelia_sitting_business_training_side";
-      console.log("Używam awatara Amelia, ID:", avatarId);
+      // Weryfikacja i użycie avatar_id
+      console.log("Weryfikuję avatar_id...");
+      let avatarId;
+      try {
+        avatarId = await verifyAndUseAvatarId(formattedData.avatar_id);
+        console.log("ID awatara:", avatarId);
+      } catch (error) {
+        console.error(
+          `Błąd podczas weryfikacji avatar_id ${formattedData.avatar_id}:`,
+          error.message
+        );
+        // Próbujemy użyć domyślnego awatara
+        avatarId = await getAvatarIdByName("Anna");
+        console.log("Używam domyślnego awatara Anna, ID:", avatarId);
+      }
 
       console.log("Pobieram ID głosu...");
       const voiceId = await getPolishVoiceId();
@@ -368,7 +385,10 @@ app.post("/custom-script-for-heygen", async (req, res) => {
       console.log("ID wideo w ZapCap:", zapcapVideoId);
 
       console.log("Tworzę zadanie w ZapCap...");
-      const taskId = await createZapCapTask(zapcapVideoId);
+      const taskId = await createZapCapTask(
+        zapcapVideoId,
+        formattedData.brollPercent
+      );
       console.log("ID zadania:", taskId);
 
       console.log("Czekam na zakończenie zadania w ZapCap...");
