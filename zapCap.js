@@ -29,6 +29,9 @@ async function uploadVideoToZapCapFromUrl(videoUrl) {
 async function createZapCapTask(videoId, brollPercent = 50) {
   console.log("Tworzę zadanie w ZapCap...");
   try {
+    // Upewniamy się, że brollPercent jest liczbą
+    const brollPercentNumber = parseInt(brollPercent, 10);
+
     const response = await axios.post(
       `${API_BASE}/videos/${videoId}/task`,
       {
@@ -37,7 +40,7 @@ async function createZapCapTask(videoId, brollPercent = 50) {
         language: "pl",
         transcribeSettings: {
           broll: {
-            brollPercent: brollPercent,
+            brollPercent: brollPercentNumber,
           },
         },
       },

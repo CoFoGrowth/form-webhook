@@ -172,21 +172,25 @@ app.post("/form-webhook", async (req, res) => {
   console.log("Nagłówki żądania:", req.headers);
 
   const data = req.body;
+
+  // Używamy nowego pola slider_value zamiast wyciągania wartości z tekstu promptu
+  const sliderValue = data["slider_value"] || "50"; // Domyślna wartość 50, jeśli pole jest puste
+
   const formattedData = {
     email: data["Adres e-mail:"],
     cel_video: data["Cel video"],
     avatar_id: data["avatar_id"],
     form_id: data.form_id,
     form_name: data.form_name,
-    koncepcja: data["Koncepcja artystyczna wideo"],
+    koncepcja: data["Opisz krótko styl rolki"],
     konto_instagram: data["Konto na Instagramie (np. @cofo.pl)"],
-    opis: data["Opis"],
+    opis: data["Opisz krótko treść rolki"],
     strona_www: data["Strona www"],
     prompt: data["Twój prompt"],
     awatar: data["Wybierz awatara"],
     zgoda: data["Zaakceptuj regulamin przetwarzania danych:"],
     client_id: data["client_id"],
-    brollPercent: parseInt(data["slider"] || "50", 10),
+    slider: sliderValue,
   };
   console.log("Dane z formularza:", formattedData);
 
@@ -210,6 +214,8 @@ app.post("/form-webhook", async (req, res) => {
   // Asynchroniczne przetwarzanie danych w tle
   (async () => {
     try {
+      console.log("Otrzymane dane z formularza:", formattedData);
+
       // Tworzymy wiadomość dla GPT na podstawie danych formularza
       const gptMessage = `Stwórz wyłącznie tekst, który mój awatar ma wypowiedzieć w krótkim wideo promującym moją markę osobistą. Nie opisuj koncepcji, nie dodawaj wprowadzeń ani podsumowań — oczekuję tylko gotowej wypowiedzi awatara, maksymalnie 300 słów.
         Wypowiedź powinna:
@@ -267,7 +273,7 @@ app.post("/form-webhook", async (req, res) => {
         text: generatedPrompt,
         fileId: formattedData.avatar_id,
         client_id: formattedData.client_id,
-        brollPercent: formattedData.brollPercent,
+        brollPercent: formattedData.slider,
       });
 
       console.log(
@@ -300,7 +306,7 @@ app.post("/custom-script-for-heygen", async (req, res) => {
     form_name: data.form_name,
     client_id: data["client_id"],
     avatar_id: data["avatar_id"],
-    brollPercent: parseInt(data["slider"] || "50", 10),
+    brollPercent: parseInt(data["slider_value"] || "50", 10),
   };
   console.log("Dane z formularza:", formattedData);
 
@@ -331,6 +337,8 @@ app.post("/custom-script-for-heygen", async (req, res) => {
 
   (async () => {
     try {
+      console.log("Otrzymane dane z formularza:", formattedData);
+
       // Weryfikacja i użycie avatar_id
       console.log("Weryfikuję avatar_id...");
       let avatarId;
