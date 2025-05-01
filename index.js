@@ -70,9 +70,19 @@ app.set("trust proxy", 1);
 // CORS
 app.use(
   cors({
-    origin: ["http://localhost:5174", "https://co-fo.vercel.app"],
+    origin: [
+      "http://localhost:5174",
+      "http://localhost:5173",
+      "https://co-fo.vercel.app",
+    ],
     methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+    ],
+    credentials: true,
   })
 );
 
