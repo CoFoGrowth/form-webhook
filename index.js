@@ -246,16 +246,6 @@ app.post("/custom-script-for-heygen", async (req, res) => {
 
   (async () => {
     try {
-      const avatarId = await verifyAndUseAvatarId(formatted.avatar_id).catch(
-        () => getAvatarIdByName("Anna")
-      );
-      const voiceId = await getPolishVoiceId();
-      const heygenVideoId = await generateHeyGenVideo(
-        avatarId,
-        voiceId,
-        formatted.custom_script
-      );
-      await waitForVideoCompletion(heygenVideoId);
       await processForm({
         avatar: formatted.avatar_id,
         text: formatted.custom_script,
