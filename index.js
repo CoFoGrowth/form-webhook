@@ -80,6 +80,8 @@ app.use(
       "http://localhost:5174",
       "http://localhost:5173",
       "https://co-fo.vercel.app",
+      "https://cofo.onrender.com",
+      "https://cofo.pl",
     ],
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: [
