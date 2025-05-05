@@ -55,14 +55,20 @@ async function createTransporter() {
   }
 }
 
-// retry-axios initialization
-const retryAxios = require("retry-axios");
-axios.defaults.raxConfig = {
-  instance: axios,
-  retry: 3,
-  retryDelay: 1000,
-};
-retryAxios.attach();
+// retry-axios initialization - converted to async import
+(async () => {
+  try {
+    const rax = await import("retry-axios");
+    axios.defaults.raxConfig = {
+      instance: axios,
+      retry: 3,
+      retryDelay: 1000,
+    };
+    rax.attach();
+  } catch (error) {
+    console.error("Error initializing retry-axios:", error);
+  }
+})();
 
 const app = express();
 app.set("trust proxy", 1);
