@@ -29,9 +29,26 @@ async function getAvatarIdByName(name) {
   }
 }
 
-// Funkcja do pobierania ID głosu dla języka polskiego na podstawie płci awatara
-async function getPolishVoiceId(gender) {
-  console.log(`Próba pobrania ID głosu dla języka polskiego i płci: ${gender}`);
+// Funkcja do pobierania ID głosu dla języka polskiego na podstawie awatara i płci
+async function getPolishVoiceId(avatarId, gender) {
+  console.log(
+    `Próba pobrania ID głosu dla awatara: ${avatarId} i płci: ${gender}`
+  );
+
+  // Specjalne awatary z dedykowanym głosem
+  const specialAvatars = [
+    "e4f99e04c3a64759a8306695446a1315",
+    "f91cb72e3456475386b6f1a53e63a24c",
+  ];
+  const specialVoiceId = "77b02d418dff418ea4a59954ddff90e9";
+
+  if (avatarId && specialAvatars.includes(avatarId)) {
+    console.log(
+      `Znaleziono specjalny awatar: ${avatarId}, używam dedykowanego głosu: ${specialVoiceId}`
+    );
+    return specialVoiceId;
+  }
+
   try {
     const response = await axios.get("https://api.heygen.com/v2/voices", {
       headers: {

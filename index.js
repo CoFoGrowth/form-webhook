@@ -144,7 +144,7 @@ async function processForm({ avatar, text, fileId, client_id, brollPercent }) {
     avatarId = await getAvatarIdByName("Anna");
   }
 
-  const voiceId = await getPolishVoiceId();
+  const voiceId = await getPolishVoiceId(avatarId);
   const heygenVideoId = await generateHeyGenVideo(avatarId, voiceId, text);
   const videoUrl = await waitForVideoCompletion(heygenVideoId);
   const timestamp = Date.now();
