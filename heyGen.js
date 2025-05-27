@@ -111,8 +111,8 @@ async function generateHeyGenVideo(avatarId, voiceId, text) {
           },
         ],
         dimension: {
-          width: 1280,
-          height: 720,
+          width: 720,
+          height: 1280,
         },
       },
       {
