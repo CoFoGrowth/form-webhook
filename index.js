@@ -181,6 +181,20 @@ async function processForm({ avatar, text, fileId, client_id, brollPercent }) {
   };
 }
 
+// Generate text endpoint
+app.post("/generate-text", async (req, res) => {
+  const { prompt } = req.body;
+  try {
+    const generatedText = await callAssistant(prompt);
+    res.json({ success: true, text: generatedText });
+  } catch (error) {
+    console.error("Error generating text:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to generate text" });
+  }
+});
+
 // Webhook: form
 app.post("/form-webhook", async (req, res) => {
   const data = req.body;
@@ -196,7 +210,7 @@ app.post("/form-webhook", async (req, res) => {
     opis: data["Opisz krótko treść rolki"],
     strona_www: data["Strona www"],
     konto_instagram: data["Konto na Instagramie (np. @cofo.pl)"],
-    prompt: data["Twój prompt"],
+    final_text: data.final_text,
   };
   res.json({
     success: true,
@@ -207,13 +221,9 @@ app.post("/form-webhook", async (req, res) => {
 
   (async () => {
     try {
-      const gptPrompt = `Stwórz wyłącznie tekst... Cel: ${formatted.cel_video}`;
-      let generated = await callAssistant(gptPrompt).catch(() => null);
-      if (!generated || generated.length > 2048)
-        generated = "Fallback AI text...";
       const result = await processForm({
         avatar: formatted.awatar,
-        text: generated,
+        text: formatted.final_text,
         fileId: formatted.avatar_id,
         client_id: formatted.client_id,
         brollPercent: formatted.slider,
