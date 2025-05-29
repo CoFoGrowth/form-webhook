@@ -39,6 +39,10 @@ async function getPolishVoiceId(avatarId, gender) {
   const specialAvatars = [
     "e4f99e04c3a64759a8306695446a1315",
     "f91cb72e3456475386b6f1a53e63a24c",
+    "14bb685a7fe54b59a395a4653e300da9", // Biała Koszula_mieszkanie_0001
+    "d19813e5217547fcaf5293181b0c39b5", // Czarna_koszula_mieszkanie_0001
+    "3cafa5d8091843b3936f4a1592a39b84", // Czerwona_sukienka_hipnozy_0001
+    "117048e935de41deb14f39a0aa27661e", // Dom_pionowy_0001
   ];
   const specialVoiceId = "77b02d418dff418ea4a59954ddff90e9";
 
