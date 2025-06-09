@@ -35,22 +35,29 @@ async function getPolishVoiceId(avatarId, gender) {
     `Próba pobrania ID głosu dla awatara: ${avatarId} i płci: ${gender}`
   );
 
-  // Specjalne awatary z dedykowanym głosem
-  const specialAvatars = [
-    "e4f99e04c3a64759a8306695446a1315",
-    "f91cb72e3456475386b6f1a53e63a24c",
-    "14bb685a7fe54b59a395a4653e300da9", // Biała Koszula_mieszkanie_0001
-    "d19813e5217547fcaf5293181b0c39b5", // Czarna_koszula_mieszkanie_0001
-    "3cafa5d8091843b3936f4a1592a39b84", // Czerwona_sukienka_hipnozy_0001
-    "117048e935de41deb14f39a0aa27661e", // Dom_pionowy_0001
-  ];
-  const specialVoiceId = "77b02d418dff418ea4a59954ddff90e9";
+  // Specjalne awatary z dedykowanymi głosami
+  const specialAvatarVoices = {
+    // Klient 0001 - głos 77b02d418dff418ea4a59954ddff90e9
+    e4f99e04c3a64759a8306695446a1315: "77b02d418dff418ea4a59954ddff90e9",
+    f91cb72e3456475386b6f1a53e63a24c: "77b02d418dff418ea4a59954ddff90e9",
+    "14bb685a7fe54b59a395a4653e300da9": "77b02d418dff418ea4a59954ddff90e9", // Biała Koszula_mieszkanie_0001
+    d19813e5217547fcaf5293181b0c39b5: "77b02d418dff418ea4a59954ddff90e9", // Czarna_koszula_mieszkanie_0001
+    "3cafa5d8091843b3936f4a1592a39b84": "77b02d418dff418ea4a59954ddff90e9", // Czerwona_sukienka_hipnozy_0001
+    "117048e935de41deb14f39a0aa27661e": "77b02d418dff418ea4a59954ddff90e9", // Dom_pionowy_0001
 
-  if (avatarId && specialAvatars.includes(avatarId)) {
+    // Klient 0002 - głos c40e6be51d034457917638c334c63fc2
+    "649781898578442d936b70762071b79d": "c40e6be51d034457917638c334c63fc2", // CzerwonaKoszulka_0002
+    "90e61fb86ac74849ad13ba6b5ea70c8a": "c40e6be51d034457917638c334c63fc2", // RafałWSamochodzie_0002
+    "61b861db8ead447fb481b621f2254273": "c40e6be51d034457917638c334c63fc2", // RafałKurtkaJeans_0002
+    a33a613eacc547fb996f36cf6b3976d4: "c40e6be51d034457917638c334c63fc2", // RafałBlackOutfit_0002
+  };
+
+  if (avatarId && specialAvatarVoices[avatarId]) {
+    const voiceId = specialAvatarVoices[avatarId];
     console.log(
-      `Znaleziono specjalny awatar: ${avatarId}, używam dedykowanego głosu: ${specialVoiceId}`
+      `Znaleziono specjalny awatar: ${avatarId}, używam dedykowanego głosu: ${voiceId}`
     );
-    return specialVoiceId;
+    return voiceId;
   }
 
   try {
