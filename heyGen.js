@@ -56,48 +56,93 @@ async function getAvatarIdByName(name) {
   }
 }
 
+// Mapa awatarów z dedykowanymi głosami z ElevenLabs
+const AVATAR_VOICE_MAPPING = {
+  // Klient 0002 - sprawdzone głosy z ElevenLabs
+  "649781898578442d936b70762071b79d": "a410f19b3706444fb92a25c65b657551", // CzerwonaKoszulka.mov
+  "90e61fb86ac74849ad13ba6b5ea70c8a": "882a52ba43fa444ab119eaafacd33515",
+  "61b861db8ead447fb481b621f2254273": "06d268085a414781852dafe9e64a51db",
+  a33a613eacc547fb996f36cf6b3976d4: "6f3cdda55791435494cff9806af6aef3",
+
+  // Klient 0001 - zachowujemy stare mapowania (do weryfikacji)
+  fc0c0ebdd4da412a8325cec59911ff74: "b47385bd5db6460aa90c58e2070fe589",
+  "88989364f8d34bd2b6a7aee2eef74910": "a0053199b97243f09d8b029e61b1d882",
+  "7de56ac82e184a3097f540696c1e2b1d": "1b2b0abed276404498b2cbbbda7d1d32",
+  "74e3eac3e1d145b29b5a5ec2f06e6c2a": "63d8a34a3765464a8e8375be2e9aade9",
+  d53fc781b5d54205b5b713d39906c8cd: "ae8b7b2f66bb43398e29d4be4e411c8b",
+};
+
+// Funkcja do weryfikacji czy głos z mapowania istnieje w HeyGen
+async function verifyVoiceMappings() {
+  console.log("🔍 Weryfikuję mapowania głosów...");
+
+  try {
+    const response = await axios.get("https://api.heygen.com/v2/voices", {
+      headers: {
+        "X-Api-Key": process.env.HEYGEN_API_KEY,
+        Accept: "application/json",
+      },
+    });
+
+    const voices = response.data.data.voices;
+    const verifiedMappings = {};
+
+    for (const [avatarId, voiceId] of Object.entries(AVATAR_VOICE_MAPPING)) {
+      const voice = voices.find((v) => v.voice_id === voiceId);
+      if (voice) {
+        verifiedMappings[avatarId] = voiceId;
+        const name =
+          voice.name || voice.display_name || voice.voice_name || "Bez nazwy";
+        console.log(`✅ ${avatarId} -> ${voiceId} (${name})`);
+      } else {
+        console.log(`❌ ${avatarId} -> ${voiceId} (GŁOS NIE ISTNIEJE)`);
+      }
+    }
+
+    return verifiedMappings;
+  } catch (error) {
+    console.error("❌ Błąd podczas weryfikacji mapowań:", error.message);
+    return {};
+  }
+}
+
 // Funkcja do pobierania ID głosu dla języka polskiego na podstawie awatara i płci
 async function getPolishVoiceId(avatarId, gender) {
   console.log(
     `Próba pobrania ID głosu dla awatara: ${avatarId} i płci: ${gender}`
   );
 
-  // Specjalne awatary z dedykowanymi głosami - WERYFIKACJA WYMAGANA
-  const specialAvatarVoices = {
-    // Klient 0001 - TODO: sprawdzić czy te głosy nadal istnieją
-    fc0c0ebdd4da412a8325cec59911ff74: "b47385bd5db6460aa90c58e2070fe589",
-    "88989364f8d34bd2b6a7aee2eef74910": "a0053199b97243f09d8b029e61b1d882",
-    "7de56ac82e184a3097f540696c1e2b1d": "1b2b0abed276404498b2cbbbda7d1d32",
-    "74e3eac3e1d145b29b5a5ec2f06e6c2a": "63d8a34a3765464a8e8375be2e9aade9",
-    d53fc781b5d54205b5b713d39906c8cd: "ae8b7b2f66bb43398e29d4be4e411c8b",
-
-    // Klient 0002 - UWAGA: głos 6650bc2d5f334f07b2f1517d421d5165 nie istnieje!
-    // "649781898578442d936b70762071b79d": "6650bc2d5f334f07b2f1517d421d5165", // USUNIĘTE - nieistniejący głos
-    "90e61fb86ac74849ad13ba6b5ea70c8a": "61c0be5bb8004350a9fb78e38891193e",
-    "61b861db8ead447fb481b621f2254273": "f870ef5e02904da6a23423c754b72365",
-    a33a613eacc547fb996f36cf6b3976d4: "3419f5469f0349bab86d9f959c1fdbbe",
-  };
-
-  // Sprawdź czy dla tego awatara jest specjalny głos i czy ten głos istnieje
-  if (avatarId && specialAvatarVoices[avatarId]) {
-    const voiceId = specialAvatarVoices[avatarId];
+  // Sprawdź czy dla tego awatara jest dedykowany głos z mapowania
+  if (avatarId && AVATAR_VOICE_MAPPING[avatarId]) {
+    const voiceId = AVATAR_VOICE_MAPPING[avatarId];
     console.log(
-      `Znaleziono specjalny awatar: ${avatarId}, sprawdzam dedykowany głos: ${voiceId}`
+      `🎯 Znaleziono mapowanie: awatar ${avatarId} -> głos ${voiceId}`
     );
 
     // Weryfikuj czy głos rzeczywiście istnieje
-    const polishVoices = await getAvailablePolishVoices();
-    const voiceExists = polishVoices.find((v) => v.voice_id === voiceId);
+    try {
+      const response = await axios.get("https://api.heygen.com/v2/voices", {
+        headers: {
+          "X-Api-Key": process.env.HEYGEN_API_KEY,
+          Accept: "application/json",
+        },
+      });
 
-    if (voiceExists) {
-      console.log(
-        `Potwierdzono istnienie dedykowanego głosu: ${voiceExists.display_name}`
+      const voice = response.data.data.voices.find(
+        (v) => v.voice_id === voiceId
       );
-      return voiceId;
-    } else {
-      console.warn(
-        `UWAGA: Dedykowany głos ${voiceId} nie istnieje! Przechodzę na fallback.`
-      );
+      if (voice) {
+        const name =
+          voice.name || voice.display_name || voice.voice_name || "Bez nazwy";
+        console.log(`✅ Potwierdzono istnienie głosu: ${name} (${voiceId})`);
+        return voiceId;
+      } else {
+        console.warn(
+          `❌ Głos ${voiceId} nie istnieje w HeyGen! Przechodzę na fallback.`
+        );
+      }
+    } catch (error) {
+      console.error("Błąd podczas weryfikacji głosu:", error.message);
     }
   }
 
@@ -504,11 +549,14 @@ async function getAvailablePolishVoices() {
     const polishVoices = voices.filter((v) => v.language === "Polish");
 
     console.log(`Znaleziono ${polishVoices.length} głosów polskich:`);
-    polishVoices.forEach((voice) => {
+    polishVoices.forEach((voice, index) => {
+      const name =
+        voice.name ||
+        voice.display_name ||
+        voice.voice_name ||
+        `Voice_${index + 1}`;
       console.log(
-        `- ${voice.display_name} (${voice.voice_id}) - ${
-          voice.gender || "unknown"
-        }`
+        `- ${name} (${voice.voice_id}) - ${voice.gender || "unknown"}`
       );
     });
 
@@ -569,25 +617,27 @@ async function findBestPolishVoice(avatarGender = null) {
 async function checkHeyGenStatus() {
   console.log("Sprawdzam status HeyGen API...");
   try {
-    const response = await axios.get("https://api.heygen.com/v1/user.get", {
+    // Spróbuj prostego endpointu do sprawdzenia czy API działa
+    const response = await axios.get("https://api.heygen.com/v2/voices", {
       headers: {
         "X-Api-Key": process.env.HEYGEN_API_KEY,
         Accept: "application/json",
       },
     });
 
-    const userData = response.data.data;
     console.log("Status HeyGen API: ✅ Aktywny");
-    console.log(`Email: ${userData.email}`);
-    console.log(`Wykorzystana quota: ${userData.used_quota}`);
-    console.log(`Pozostała quota: ${userData.remaining_quota}`);
+    console.log(
+      `Znaleziono ${response.data.data.voices.length} głosów w systemie`
+    );
 
-    if (userData.remaining_quota <= 0) {
-      console.error("⚠️ UWAGA: Brak pozostałej quoty w HeyGen!");
+    // Sprawdź czy API key jest prawidłowy
+    if (response.data && response.data.data) {
+      console.log("✅ API Key jest prawidłowy");
+      return true;
+    } else {
+      console.error("❌ Nieprawidłowa odpowiedź z API");
       return false;
     }
-
-    return true;
   } catch (error) {
     console.error("❌ Problem z HeyGen API:", error.message);
     if (error.response) {
@@ -595,6 +645,174 @@ async function checkHeyGenStatus() {
       console.error("Data:", error.response.data);
     }
     return false;
+  }
+}
+
+// Funkcja do pełnej analizy głosów w HeyGen
+async function analyzeAllVoices() {
+  console.log("🔍 Analizuję wszystkie głosy w HeyGen...");
+  try {
+    const response = await axios.get("https://api.heygen.com/v2/voices", {
+      headers: {
+        "X-Api-Key": process.env.HEYGEN_API_KEY,
+        Accept: "application/json",
+      },
+    });
+
+    const voices = response.data.data.voices;
+    console.log(`📊 Znaleziono ${voices.length} głosów łącznie`);
+
+    // Sprawdź strukturę pierwszego głosu
+    if (voices.length > 0) {
+      console.log("🔬 Struktura pierwszego głosu:");
+      console.log(JSON.stringify(voices[0], null, 2));
+    }
+
+    // Filtruj głosy polskie i pokaż szczegóły
+    const polishVoices = voices.filter((v) => v.language === "Polish");
+    console.log(`🇵🇱 Znaleziono ${polishVoices.length} głosów polskich`);
+
+    // Sprawdź które głosy z ElevenLabs są dostępne
+    const elevenLabsVoices = [
+      "a410f19b3706444fb92a25c65b657551",
+      "882a52ba43fa444ab119eaafacd33515",
+      "06d268085a414781852dafe9e64a51db",
+      "6f3cdda55791435494cff9806af6aef3",
+    ];
+
+    console.log("🎙️ Sprawdzam głosy z ElevenLabs...");
+    elevenLabsVoices.forEach((voiceId) => {
+      const voice = voices.find((v) => v.voice_id === voiceId);
+      if (voice) {
+        console.log(`✅ Znaleziono: ${voiceId}`);
+        console.log(
+          `   - Nazwa: ${
+            voice.name || voice.display_name || voice.voice_name || "Brak nazwy"
+          }`
+        );
+        console.log(`   - Język: ${voice.language || "Nieznany"}`);
+        console.log(`   - Płeć: ${voice.gender || "Nieznana"}`);
+        console.log(`   - Typ: ${voice.type || "Nieznany"}`);
+      } else {
+        console.log(`❌ Nie znaleziono: ${voiceId}`);
+      }
+    });
+
+    // Pokaż wszystkie głosy polskie z dostępnymi polami
+    console.log("\n📋 Wszystkie głosy polskie:");
+    polishVoices.forEach((voice, index) => {
+      const name =
+        voice.name ||
+        voice.display_name ||
+        voice.voice_name ||
+        `Voice_${index + 1}`;
+      console.log(`${index + 1}. ${name} (ID: ${voice.voice_id})`);
+      console.log(`   - Język: ${voice.language || "Nieznany"}`);
+      console.log(`   - Płeć: ${voice.gender || "Nieznana"}`);
+      console.log(`   - Typ: ${voice.type || "Nieznany"}`);
+      if (voice.preview_audio) {
+        console.log(`   - Podgląd: ${voice.preview_audio}`);
+      }
+    });
+
+    return voices;
+  } catch (error) {
+    console.error("❌ Błąd podczas analizy głosów:", error.message);
+    return [];
+  }
+}
+
+// Funkcja testowa do sprawdzenia wszystkich głosów i mapowań
+async function testVoicesAndMappings() {
+  console.log("🧪 ROZPOCZYNAM PEŁNY TEST GŁOSÓW I MAPOWAŃ");
+  console.log("=" * 50);
+
+  // 1. Analiza wszystkich głosów
+  await analyzeAllVoices();
+
+  console.log("\n" + "=" * 50);
+
+  // 2. Weryfikacja mapowań
+  const verifiedMappings = await verifyVoiceMappings();
+
+  console.log("\n" + "=" * 50);
+
+  // 3. Test dla konkretnego awatara
+  const testAvatarId = "649781898578442d936b70762071b79d";
+  console.log(`🎯 Test dla awatara: ${testAvatarId}`);
+
+  try {
+    const selectedVoiceId = await getPolishVoiceId(testAvatarId, null);
+    console.log(`✅ Wybrany głos: ${selectedVoiceId}`);
+  } catch (error) {
+    console.error(`❌ Błąd podczas wyboru głosu: ${error.message}`);
+  }
+
+  console.log("\n🧪 KONIEC TESTU");
+  return verifiedMappings;
+}
+
+// Funkcja do testowania z różnymi awatarami
+async function testWithDifferentAvatars() {
+  console.log("🎭 Testuję różne awatary...");
+
+  // Lista awatarów do przetestowania
+  const testAvatars = [
+    "649781898578442d936b70762071b79d", // problematyczny
+    "90e61fb86ac74849ad13ba6b5ea70c8a", // inny z mapowania
+    "fc0c0ebdd4da412a8325cec59911ff74", // z pierwszego klienta
+  ];
+
+  // Testowy tekst
+  const testText = "Test wideo";
+
+  for (const avatarId of testAvatars) {
+    console.log(`\n🎭 Testuję awatar: ${avatarId}`);
+
+    try {
+      // 1. Sprawdź czy awatar istnieje
+      const avatarExists = await verifyAndUseAvatarId(avatarId);
+      console.log(`✅ Awatar istnieje: ${avatarExists}`);
+
+      // 2. Wybierz głos
+      const voiceId = await getPolishVoiceId(avatarId, null);
+      console.log(`✅ Wybrany głos: ${voiceId}`);
+
+      // 3. Sprawdź kompatybilność
+      const isCompatible = await verifyVoiceAvatarCompatibility(
+        avatarId,
+        voiceId
+      );
+      console.log(`✅ Kompatybilność: ${isCompatible}`);
+
+      // 4. Spróbuj wygenerować (tylko przygotuj request, nie wysyłaj)
+      const requestData = {
+        video_inputs: [
+          {
+            character: {
+              type: "avatar",
+              avatar_id: avatarId,
+              avatar_style: "normal",
+            },
+            voice: {
+              type: "text",
+              input_text: testText,
+              voice_id: voiceId,
+              speed: 1.0,
+            },
+          },
+        ],
+        dimension: {
+          width: 720,
+          height: 1280,
+        },
+      };
+
+      console.log(`📋 Request data gotowy dla ${avatarId}`);
+      console.log(JSON.stringify(requestData, null, 2));
+    } catch (error) {
+      console.error(`❌ Błąd dla awatara ${avatarId}: ${error.message}`);
+    }
   }
 }
 
@@ -609,4 +827,8 @@ module.exports = {
   getAvailablePolishVoices,
   findBestPolishVoice,
   checkHeyGenStatus,
+  analyzeAllVoices,
+  verifyVoiceMappings,
+  testVoicesAndMappings,
+  testWithDifferentAvatars,
 };
