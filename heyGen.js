@@ -37,26 +37,18 @@ async function getPolishVoiceId(avatarId, gender) {
 
   // Specjalne awatary z dedykowanymi głosami
   const specialAvatarVoices = {
-    // Klient 0001 - głos 77b02d418dff418ea4a59954ddff90e9
-    e4f99e04c3a64759a8306695446a1315: "77b02d418dff418ea4a59954ddff90e9",
-    f91cb72e3456475386b6f1a53e63a24c: "77b02d418dff418ea4a59954ddff90e9",
-    "14bb685a7fe54b59a395a4653e300da9": "77b02d418dff418ea4a59954ddff90e9", // Biała Koszula_mieszkanie_0001
-    d19813e5217547fcaf5293181b0c39b5: "77b02d418dff418ea4a59954ddff90e9", // Czarna_koszula_mieszkanie_0001
-    "3cafa5d8091843b3936f4a1592a39b84": "77b02d418dff418ea4a59954ddff90e9", // Czerwona_sukienka_hipnozy_0001
-    "117048e935de41deb14f39a0aa27661e": "77b02d418dff418ea4a59954ddff90e9", // Dom_pionowy_0001
+    // Klient 0001
+    fc0c0ebdd4da412a8325cec59911ff74: "b47385bd5db6460aa90c58e2070fe589",
+    "88989364f8d34bd2b6a7aee2eef74910": "a0053199b97243f09d8b029e61b1d882",
+    "7de56ac82e184a3097f540696c1e2b1d": "1b2b0abed276404498b2cbbbda7d1d32",
+    "74e3eac3e1d145b29b5a5ec2f06e6c2a": "63d8a34a3765464a8e8375be2e9aade9",
+    d53fc781b5d54205b5b713d39906c8cd: "ae8b7b2f66bb43398e29d4be4e411c8b",
 
-    // Klient 0001 - nowe awatary z dedykowanymi głosami
-    fc0c0ebdd4da412a8325cec59911ff74: "b47385bd5db6460aa90c58e2070fe589", // Nowy głos_1
-    "88989364f8d34bd2b6a7aee2eef74910": "a0053199b97243f09d8b029e61b1d882", // Nowy głos_2
-    "7de56ac82e184a3097f540696c1e2b1d": "1b2b0abed276404498b2cbbbda7d1d32", // Nowy głos_3
-    "74e3eac3e1d145b29b5a5ec2f06e6c2a": "63d8a34a3765464a8e8375be2e9aade9", // Nowy głos_4
-    d53fc781b5d54205b5b713d39906c8cd: "ae8b7b2f66bb43398e29d4be4e411c8b", // Nowy głos_5
-
-    // Klient 0002 - głos c40e6be51d034457917638c334c63fc2
-    "649781898578442d936b70762071b79d": "c40e6be51d034457917638c334c63fc2", // CzerwonaKoszulka_0002
-    "90e61fb86ac74849ad13ba6b5ea70c8a": "c40e6be51d034457917638c334c63fc2", // RafałWSamochodzie_0002
-    "61b861db8ead447fb481b621f2254273": "c40e6be51d034457917638c334c63fc2", // RafałKurtkaJeans_0002
-    a33a613eacc547fb996f36cf6b3976d4: "c40e6be51d034457917638c334c63fc2", // RafałBlackOutfit_0002
+    // Klient 0002
+    "649781898578442d936b70762071b79d": "6650bc2d5f334f07b2f1517d421d5165",
+    "90e61fb86ac74849ad13ba6b5ea70c8a": "61c0be5bb8004350a9fb78e38891193e",
+    "61b861db8ead447fb481b621f2254273": "f870ef5e02904da6a23423c754b72365",
+    a33a613eacc547fb996f36cf6b3976d4: "3419f5469f0349bab86d9f959c1fdbbe",
   };
 
   if (avatarId && specialAvatarVoices[avatarId]) {
