@@ -56,15 +56,14 @@ async function getAvatarIdByName(name) {
   }
 }
 
-// Mapa awatarów z dedykowanymi głosami z ElevenLabs
 const AVATAR_VOICE_MAPPING = {
-  // Klient 0002 - sprawdzone głosy z ElevenLabs
-  "649781898578442d936b70762071b79d": "a410f19b3706444fb92a25c65b657551", // CzerwonaKoszulka.mov
+  // 0002
+  ef912416d4dc4ed1b492a09ed7c6846a: "a410f19b3706444fb92a25c65b657551",
   "90e61fb86ac74849ad13ba6b5ea70c8a": "882a52ba43fa444ab119eaafacd33515",
   "61b861db8ead447fb481b621f2254273": "06d268085a414781852dafe9e64a51db",
   a33a613eacc547fb996f36cf6b3976d4: "6f3cdda55791435494cff9806af6aef3",
 
-  // Klient 0001 - zachowujemy stare mapowania (do weryfikacji)
+  // 0001
   fc0c0ebdd4da412a8325cec59911ff74: "b47385bd5db6460aa90c58e2070fe589",
   "88989364f8d34bd2b6a7aee2eef74910": "a0053199b97243f09d8b029e61b1d882",
   "7de56ac82e184a3097f540696c1e2b1d": "1b2b0abed276404498b2cbbbda7d1d32",
@@ -72,7 +71,6 @@ const AVATAR_VOICE_MAPPING = {
   d53fc781b5d54205b5b713d39906c8cd: "ae8b7b2f66bb43398e29d4be4e411c8b",
 };
 
-// Funkcja do weryfikacji czy głos z mapowania istnieje w HeyGen
 async function verifyVoiceMappings() {
   console.log("🔍 Weryfikuję mapowania głosów...");
 
