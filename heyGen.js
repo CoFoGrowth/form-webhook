@@ -1,6 +1,5 @@
 const axios = require("axios");
 
-// Funkcja do testowania połączenia z HeyGen API
 async function testHeyGenConnection() {
   console.log("Testuję połączenie z HeyGen API...");
   try {
