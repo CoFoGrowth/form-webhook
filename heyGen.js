@@ -255,6 +255,17 @@ async function generateHeyGenVideo(avatarId, voiceId, text) {
       throw new Error(`Awatar o ID ${avatarId} nie istnieje`);
     }
 
+    // Transformacja tekstu - dodanie większych przerw między zdaniami
+    const processedText = text
+      .split(/(?<=[.?!])\s+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join("\n\n");
+
+    console.log(
+      `Przekształcony tekst dla lepszych przerw między zdaniami (${processedText.length} znaków)`
+    );
+
     const requestData = {
       video_inputs: [
         {
@@ -265,7 +276,7 @@ async function generateHeyGenVideo(avatarId, voiceId, text) {
           },
           voice: {
             type: "text",
-            input_text: text,
+            input_text: processedText,
             voice_id: voiceId,
             speed: 1.0,
           },
@@ -342,7 +353,7 @@ async function generateHeyGenVideo(avatarId, voiceId, text) {
                 },
                 voice: {
                   type: "text",
-                  input_text: text,
+                  input_text: processedText,
                   voice_id: alternativeVoiceId, // użyj alternatywnego głosu
                   speed: 1.0,
                 },
