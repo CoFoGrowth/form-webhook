@@ -77,6 +77,17 @@ const AVATAR_VOICE_MAPPING = {
   "3c3ddaa1a99844c682d810290539fda8": "ae8b7b2f66bb43398e29d4be4e411c8b",
   "72119bafb4674537af105164001cf734": "1b2b0abed276404498b2cbbbda7d1d32",
   bcd3a34820fa4aa9a417e3686e43acff: "77b02d418dff418ea4a59954ddff90e9",
+
+  // Nowe awatary Zuzanna dla 0001
+  "8682655562b3432d84bfe2189b492319": "a58b3f59627e4c1faf12abf5d18a347b", // Zuzanna_nowyNowy_1
+  d394a04b1c2548238d3b4953f739efe5: "c0dc6968f42e422b9da80abe3580bb11", // Zuzanna_nowyNowy_2
+  "4d155442543b49d2b41590a4133e0444": "917fdc23e0af4719b145bdca31adb89f", // Zuzanna_nowyNowy_3
+  "9092040beff14d598eb8fc7a19050981": "16801b2fd8714103a39bdbb51a9863ae", // Zuzanna_nowyNowy_4
+  aad991539a724bd1a5ee733bc4c2e0dc: "8b64b3c16739424b8cfa2590c30fd5eb", // Zuzanna_nowyNowy_5
+  "9307c5ee4c124e6e9ab73c24aaeb7c49": "696fcd7da6784ce4bed95e5e6b72ffae", // Zuzanna_nowyNowy_6
+  d0454740b1854f1e8ae4ed4d323e664d: "bc4fcc17960343ca91846951c42273c3", // Zuzanna_nowyNowy_7
+  "73fcb4393f144904a39f2707443cb285": "bd0c198175dc472ea58f4c243f6eb37e", // Zuzanna_nowyNowy_8
+  "77746b1abab54cd4b7314bbe4ea35853": "f1aad6e1fa0f40fc8d31231fcc8c974b", // Zuzanna_nowyNowy_9
 };
 
 async function verifyVoiceMappings() {
