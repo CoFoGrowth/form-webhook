@@ -88,6 +88,9 @@ const AVATAR_VOICE_MAPPING = {
   d0454740b1854f1e8ae4ed4d323e664d: "bc4fcc17960343ca91846951c42273c3", // Zuzanna_nowyNowy_7
   "73fcb4393f144904a39f2707443cb285": "bd0c198175dc472ea58f4c243f6eb37e", // Zuzanna_nowyNowy_8
   "77746b1abab54cd4b7314bbe4ea35853": "f1aad6e1fa0f40fc8d31231fcc8c974b", // Zuzanna_nowyNowy_9
+
+  // 0004
+  "680c8f7675c7438481930d2346e338a7": "7fbad8be3d2949f49648bf8726bcb46d",
 };
 
 async function verifyVoiceMappings() {
