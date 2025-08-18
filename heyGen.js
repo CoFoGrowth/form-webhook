@@ -620,7 +620,7 @@ async function findBestPolishVoice(avatarGender = null) {
 
   // Sprawdź czy istnieją nasze preferowane głosy
   const preferredFemaleId = "ba3b2274201d4f18b8b6888ad991bffe";
-  const preferredMaleId = "c126eda711af4a2086c4cfb60ae93304";
+  const preferredMaleId = "36969ead9c664bd68c88642b23d53cc2"; // Tomasz - męski głos
 
   const preferredFemale = polishVoices.find(
     (v) => v.voice_id === preferredFemaleId
@@ -644,10 +644,18 @@ async function findBestPolishVoice(avatarGender = null) {
     return preferredMale.voice_id;
   }
 
-  // Fallback - wybierz pierwszy dostępny głos polski
+  // Fallback - dla nieznanych płci wybierz męski głos jako domyślny
+  if (preferredMale) {
+    console.log(
+      `Fallback: wybrano domyślny męski głos: ${preferredMale.display_name} (${preferredMale.voice_id})`
+    );
+    return preferredMale.voice_id;
+  }
+
+  // Ostateczny fallback - pierwszy dostępny głos
   const firstAvailable = polishVoices[0];
   console.log(
-    `Fallback: wybrano pierwszy dostępny głos: ${firstAvailable.display_name} (${firstAvailable.voice_id})`
+    `Ostateczny fallback: wybrano pierwszy dostępny głos: ${firstAvailable.display_name} (${firstAvailable.voice_id})`
   );
   return firstAvailable.voice_id;
 }
