@@ -619,7 +619,7 @@ async function findBestPolishVoice(avatarGender = null) {
   }
 
   // Sprawdź czy istnieją nasze preferowane głosy
-  const preferredFemaleId = "ba3b2274201d4f18b8b6888ad991bffe";
+  const preferredFemaleId = "ba3b2274201d4f18b8b6888ad991bffe"; // Zofia - Natural
   const preferredMaleId = "36969ead9c664bd68c88642b23d53cc2"; // Tomasz - męski głos
 
   const preferredFemale = polishVoices.find(
@@ -632,14 +632,18 @@ async function findBestPolishVoice(avatarGender = null) {
   // Jeśli awatar ma określoną płeć, wybierz odpowiedni głos
   if (avatarGender === "female" && preferredFemale) {
     console.log(
-      `Wybrano preferowany głos kobiecy: ${preferredFemale.display_name}`
+      `Wybrano preferowany głos kobiecy: ${
+        preferredFemale.display_name || preferredFemale.name
+      }`
     );
     return preferredFemale.voice_id;
   }
 
   if (avatarGender === "male" && preferredMale) {
     console.log(
-      `Wybrano preferowany głos męski: ${preferredMale.display_name}`
+      `Wybrano preferowany głos męski: ${
+        preferredMale.display_name || preferredMale.name
+      }`
     );
     return preferredMale.voice_id;
   }
@@ -647,15 +651,35 @@ async function findBestPolishVoice(avatarGender = null) {
   // Fallback - dla nieznanych płci wybierz męski głos jako domyślny
   if (preferredMale) {
     console.log(
-      `Fallback: wybrano domyślny męski głos: ${preferredMale.display_name} (${preferredMale.voice_id})`
+      `Fallback: wybrano domyślny męski głos: ${
+        preferredMale.display_name || preferredMale.name
+      } (${preferredMale.voice_id})`
     );
     return preferredMale.voice_id;
+  }
+
+  // Ostateczny fallback - pierwszy dostępny męski głos
+  const maleVoice = polishVoices.find(
+    (v) =>
+      v.gender &&
+      (v.gender.toLowerCase() === "male" || v.gender.toLowerCase() === "męski")
+  );
+
+  if (maleVoice) {
+    console.log(
+      `Fallback męski: wybrano ${maleVoice.display_name || maleVoice.name} (${
+        maleVoice.voice_id
+      })`
+    );
+    return maleVoice.voice_id;
   }
 
   // Ostateczny fallback - pierwszy dostępny głos
   const firstAvailable = polishVoices[0];
   console.log(
-    `Ostateczny fallback: wybrano pierwszy dostępny głos: ${firstAvailable.display_name} (${firstAvailable.voice_id})`
+    `Ostateczny fallback: wybrano pierwszy dostępny głos: ${
+      firstAvailable.display_name || firstAvailable.name
+    } (${firstAvailable.voice_id})`
   );
   return firstAvailable.voice_id;
 }
