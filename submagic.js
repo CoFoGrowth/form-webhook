@@ -18,6 +18,9 @@ async function createSubmagicProject(
         language: language,
         videoUrl: videoUrl,
         templateName: templateName,
+        magicZooms: true,
+        magicBrolls: true,
+        magicBrollsPercentage: 75,
       },
       {
         headers: {
