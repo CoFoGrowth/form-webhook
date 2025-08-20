@@ -114,11 +114,20 @@ const {
   waitForVideoCompletion,
   verifyAndUseAvatarId,
 } = require("./heyGen");
+
+// ZapCap imports (zakomentowane)
+// const {
+//   uploadVideoToZapCapFromUrl,
+//   createZapCapTask,
+//   waitForZapCapTask,
+// } = require("./zapCap");
+
+// Nowe importy dla Submagic
 const {
-  uploadVideoToZapCapFromUrl,
-  createZapCapTask,
-  waitForZapCapTask,
-} = require("./zapCap");
+  createSubmagicProject,
+  waitForSubmagicCompletion,
+} = require("./submagic");
+
 const { callAssistant } = require("./openAi");
 const { uploadStreamToDrive } = require("./googleDrive");
 
@@ -160,10 +169,19 @@ async function processForm({ avatar, text, fileId, client_id, brollPercent }) {
     folderId
   );
 
-  // ZapCap
-  const zapcapVideoId = await uploadVideoToZapCapFromUrl(videoUrl);
-  const taskId = await createZapCapTask(zapcapVideoId, brollPercent);
-  const downloadUrl = await waitForZapCapTask(zapcapVideoId, taskId);
+  // Submagic - nowa logika
+  const submagicProject = await createSubmagicProject(
+    videoUrl,
+    `Video ${timestamp}`,
+    "pl",
+    "Hormozi 2"
+  );
+  const downloadUrl = await waitForSubmagicCompletion(submagicProject.id);
+
+  // ZapCap - stara logika (zakomentowana)
+  // const zapcapVideoId = await uploadVideoToZapCapFromUrl(videoUrl);
+  // const taskId = await createZapCapTask(zapcapVideoId, brollPercent);
+  // const downloadUrl = await waitForZapCapTask(zapcapVideoId, taskId);
 
   // Upload processed
   const procResp = await axios.get(downloadUrl, { responseType: "stream" });
@@ -177,7 +195,7 @@ async function processForm({ avatar, text, fileId, client_id, brollPercent }) {
 
   return {
     heygenDriveFileId: originalFileId,
-    zapcapDriveFileId: processedFileId,
+    submagicDriveFileId: processedFileId, // zmienione z zapcapDriveFileId
   };
 }
 
