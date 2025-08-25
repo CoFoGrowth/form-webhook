@@ -7,7 +7,7 @@ async function createSubmagicProject(
   videoUrl,
   title = "Generated Video",
   language = "pl",
-  templateName = "Hormozi 2"
+  templateName = "PrzemekFinisz" // Zmienione z "Hormozi 2" na "PrzemekFinisz"
 ) {
   console.log("Tworzę projekt w Submagic...");
   try {
@@ -20,7 +20,7 @@ async function createSubmagicProject(
         templateName: templateName,
         magicZooms: true,
         magicBrolls: true,
-        magicBrollsPercentage: 75,
+        magicBrollsPercentage: 100,
       },
       {
         headers: {

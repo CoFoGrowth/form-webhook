@@ -130,6 +130,7 @@ const {
 
 const { callAssistant } = require("./openAi");
 const { uploadStreamToDrive } = require("./googleDrive");
+const { combineVideosFromDrive } = require("./videoEditor");
 
 // Map client_id to Drive folder
 function getFolderIdByClientId(clientId) {
@@ -159,7 +160,7 @@ async function processForm({ avatar, text, fileId, client_id, brollPercent }) {
   const timestamp = Date.now();
   const folderId = getFolderIdByClientId(client_id);
 
-  // Upload original
+  // Upload original HeyGen video
   const origResp = await axios.get(videoUrl, { responseType: "stream" });
   const origPassthrough = new PassThrough();
   origResp.data.pipe(origPassthrough);
@@ -178,12 +179,7 @@ async function processForm({ avatar, text, fileId, client_id, brollPercent }) {
   );
   const downloadUrl = await waitForSubmagicCompletion(submagicProject.id);
 
-  // ZapCap - stara logika (zakomentowana)
-  // const zapcapVideoId = await uploadVideoToZapCapFromUrl(videoUrl);
-  // const taskId = await createZapCapTask(zapcapVideoId, brollPercent);
-  // const downloadUrl = await waitForZapCapTask(zapcapVideoId, taskId);
-
-  // Upload processed
+  // Upload processed Submagic video
   const procResp = await axios.get(downloadUrl, { responseType: "stream" });
   const procPassthrough = new PassThrough();
   procResp.data.pipe(procPassthrough);
@@ -193,9 +189,17 @@ async function processForm({ avatar, text, fileId, client_id, brollPercent }) {
     folderId
   );
 
+  // Połącz oba filmy w jeden (Submagic na górze, HeyGen na dole)
+  const combinedFileId = await combineVideosFromDrive(
+    originalFileId, // HeyGen (dół)
+    processedFileId, // Submagic (góra)
+    client_id
+  );
+
   return {
     heygenDriveFileId: originalFileId,
-    submagicDriveFileId: processedFileId, // zmienione z zapcapDriveFileId
+    submagicDriveFileId: processedFileId,
+    combinedDriveFileId: combinedFileId, // nowy połączony film
   };
 }
 
